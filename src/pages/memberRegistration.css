@@ -1,0 +1,145 @@
+.registration-page {
+    position: relative;
+    min-height: calc(100vh - 100px);
+    /* Adjust based on header/layout */
+    width: 100%;
+    overflow: hidden;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+.registration__background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.registration__gradient {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: float 20s ease-in-out infinite;
+}
+
+.registration__gradient--1 {
+    width: 500px;
+    height: 500px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    top: -10%;
+    left: -10%;
+    animation-delay: 0s;
+}
+
+.registration__gradient--2 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    bottom: -10%;
+    right: -10%;
+    animation-delay: 7s;
+}
+
+.registration__gradient--3 {
+    width: 450px;
+    height: 450px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: 14s;
+}
+
+/* Glass Card */
+.registration__card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-radius: 24px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Overrides for MemberForm components to match Login theme */
+/* Overrides for MemberForm components to match Login theme */
+.registration__card .form-control,
+.registration__card .form-control__input,
+.registration__card .form-control__select {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #111827;
+}
+
+.registration__card .form-control {
+    background: transparent !important;
+    /* Wrapper should be transparent if inputs are styled, or glass if wrapper is the box */
+    border: none !important;
+    /* Remove wrapper border if it exists */
+}
+
+/* Re-apply glass to inputs specifically */
+.registration__card .form-control__input,
+.registration__card .form-control__select {
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 12px !important;
+}
+
+.registration__card .form-control__input:focus,
+.registration__card .form-control__select:focus {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1) !important;
+}
+
+.registration__card .form-control__label {
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.registration__card .form-header h2 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.registration__card .step-number {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.registration__card .progress-step.active .step-number {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.registration__card .form-control__image-placeholder {
+    background: rgba(255, 255, 255, 0.4);
+    border: 2px dashed rgba(102, 126, 234, 0.3);
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(30px, -30px) scale(1.1);
+    }
+
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+}

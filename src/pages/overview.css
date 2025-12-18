@@ -1,0 +1,118 @@
+.overview__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.overview__card--total {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.overview__card--total::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.overview__card--total .overview__card-value {
+  font-size: 3.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.overview__card--total .overview__card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.overview__card {
+  border-radius: 1rem;
+  padding: 2rem;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.overview__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.overview__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.overview__card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem 0;
+  opacity: 0.95;
+}
+
+.overview__card-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  line-height: 1;
+  color: #fff;
+}
+
+.overview__card-description {
+  font-size: 0.875rem;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .overview__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview__card {
+    padding: 1.5rem;
+  }
+
+  .overview__card-value {
+    font-size: 2rem;
+  }
+
+  .overview__card--total {
+    grid-column: 1;
+  }
+
+  .overview__card--total .overview__card-value {
+    font-size: 2.5rem;
+  }
+}
+

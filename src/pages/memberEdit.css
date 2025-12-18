@@ -1,0 +1,207 @@
+.member-edit__loading,
+.member-edit__error {
+    padding: 2rem;
+    text-align: center;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.member-edit__error {
+    color: #ef4444;
+}
+
+.member-edit__container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.member-edit__form {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.member-edit__avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.member-edit__avatar-display {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.member-edit__avatar-display:hover {
+    box-shadow: 0 8px 12px -1px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+.member-edit__avatar-display:hover .member-edit__avatar-overlay {
+    opacity: 1;
+}
+
+.member-edit__avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: white;
+}
+
+.member-edit__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.member-edit__avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.member-edit__avatar-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.member-edit__avatar-info p {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.member-edit__change-photo-btn {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #4f46e5;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.member-edit__change-photo-btn:hover {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+
+.member-edit__section {
+    margin-bottom: 2.5rem;
+}
+
+.member-edit__section:last-of-type {
+    margin-bottom: 2rem;
+}
+
+.member-edit__section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.member-edit__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.member-edit__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.member-edit__btn {
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    min-width: 140px;
+}
+
+.member-edit__btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.member-edit__btn--cancel {
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.member-edit__btn--cancel:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.member-edit__btn--save {
+    background: #4f46e5;
+    color: white;
+}
+
+.member-edit__btn--save:hover:not(:disabled) {
+    background: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+}
+
+.member-edit__btn--save:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .member-edit__form {
+        padding: 1.5rem;
+    }
+
+    .member-edit__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .member-edit__actions {
+        flex-direction: column-reverse;
+    }
+
+    .member-edit__btn {
+        width: 100%;
+    }
+}

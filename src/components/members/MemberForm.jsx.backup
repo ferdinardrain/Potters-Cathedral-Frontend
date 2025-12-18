@@ -1,0 +1,499 @@
+import { useMemo, useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
+import TextInput from '../form/TextInput'
+import CustomSelect from '../form/CustomSelect'
+import CustomDatePicker from '../form/CustomDatePicker'
+import ImageInput from '../form/ImageInput'
+import { MARITAL_STATUS_OPTIONS } from '../../services/memberService'
+import { FiUser, FiHome, FiPhone, FiMapPin, FiCalendar, FiChevronRight, FiChevronLeft, FiCheck, FiInfo, FiEye, FiX } from 'react-icons/fi'
+import './memberForm.css'
+
+const phoneRegex = /^\+?\d{9,15}$/
+
+const defaultValues = {
+  fullName: '',
+  age: '',
+  dob: '',
+  residence: '',
+  gpsAddress: '',
+  phoneNumber: '',
+  altPhoneNumber: '',
+  nationality: '',
+  maritalStatus: '',
+  joiningDate: '',
+  avatar: '',
+}
+
+const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel, isSaving }) => {
+  const [values, setValues] = useState({ ...defaultValues, ...initialValues })
+  const [errors, setErrors] = useState({})
+  const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+
+  // Calculate age from DOB
+  const calculateAgeFromDOB = (dob) => {
+    if (!dob) return ''
+    const birthDate = new Date(dob)
+    const todayDate = new Date()
+    let age = todayDate.getFullYear() - birthDate.getFullYear()
+    const monthDiff = todayDate.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && todayDate.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age > 0 ? age.toString() : ''
+  }
+
+  // Validate that age and DOB match
+  const validateAgeAndDOB = (age, dob) => {
+    if (!age || !dob) return null
+    const calculatedAge = calculateAgeFromDOB(dob)
+    if (calculatedAge && calculatedAge !== age.toString()) {
+      return 'Age and Date of Birth do not match. Please ensure they are consistent.'
+    }
+    return null
+  }
+
+  const isMinor = useMemo(() => {
+    const age = Number(values.age)
+    return age > 0 && age < 18
+  }, [values.age])
+
+  // Update form values when initialValues changes (for edit mode)
+  useEffect(() => {
+    if (initialValues && Object.keys(initialValues).length > 0) {
+      console.log('Updating form with initialValues:', initialValues)
+      setValues({ ...defaultValues, ...initialValues })
+    }
+  }, [initialValues])
+
+  // Clear marital status when age changes to below 18
+  useEffect(() => {
+    if (isMinor && values.maritalStatus) {
+      setValues((prev) => ({ ...prev, maritalStatus: '' }))
+      if (errors.maritalStatus) {
+        setErrors((prev) => {
+          const newErrors = { ...prev }
+          delete newErrors.maritalStatus
+          return newErrors
+        })
+      }
+    }
+  }, [isMinor])
+
+  const validate = () => {
+    const validationErrors = {}
+    const requiredFields = [
+      'fullName',
+      'dob',
+      'residence',
+      'gpsAddress',
+      'phoneNumber',
+      'nationality',
+      'joiningDate',
+    ]
+
+    // Only require marital status if member is 18 or older
+    if (!isMinor) {
+      requiredFields.push('maritalStatus')
+    }
+
+    requiredFields.forEach((field) => {
+      if (!values[field]) validationErrors[field] = 'This field is required'
+    })
+    if (values.age && (Number.isNaN(Number(values.age)) || Number(values.age) <= 0)) {
+      validationErrors.age = 'Enter a valid age'
+    }
+    if (values.phoneNumber && !phoneRegex.test(values.phoneNumber)) {
+      validationErrors.phoneNumber = 'Enter a valid phone number'
+    }
+    if (values.altPhoneNumber && !phoneRegex.test(values.altPhoneNumber)) {
+      validationErrors.altPhoneNumber = 'Enter a valid phone number'
+    }
+    if (values.dob && values.dob > today) {
+      validationErrors.dob = 'DOB cannot be in the future'
+    }
+    if (values.joiningDate && values.joiningDate > today) {
+      validationErrors.joiningDate = 'Joining date cannot be in the future'
+    }
+
+    // Validate age and DOB match
+    const ageDOBError = validateAgeAndDOB(values.age, values.dob)
+    if (ageDOBError) {
+      validationErrors.age = ageDOBError
+      validationErrors.dob = ageDOBError
+    }
+
+    setErrors(validationErrors)
+    return Object.keys(validationErrors).length === 0
+  }
+
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    const newValues = { ...values, [name]: value }
+
+    // Auto-calculate age when DOB changes
+    if (name === 'dob' && value) {
+      const calculatedAge = calculateAgeFromDOB(value)
+      if (calculatedAge) {
+        newValues.age = calculatedAge
+        // Clear marital status if age is below 18
+        if (Number(calculatedAge) < 18) {
+          newValues.maritalStatus = ''
+        }
+        // Clear age error if it was set
+        if (errors.age) {
+          setErrors((prev) => ({ ...prev, age: '' }))
+        }
+      }
+    }
+
+    // Clear marital status if age changes to below 18
+    if (name === 'age' && value) {
+      const age = Number(value)
+      if (age > 0 && age < 18) {
+        newValues.maritalStatus = ''
+        // Clear marital status error if it was set
+        if (errors.maritalStatus) {
+          setErrors((prev) => ({ ...prev, maritalStatus: '' }))
+        }
+      }
+    }
+
+    setValues(newValues)
+
+    // Clear errors for the changed field
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }))
+    }
+
+    // If both age and dob are present, validate they match
+    if ((name === 'age' || name === 'dob') && newValues.age && newValues.dob) {
+      const ageDOBError = validateAgeAndDOB(newValues.age, newValues.dob)
+      if (ageDOBError) {
+        setErrors((prev) => ({
+          ...prev,
+          age: ageDOBError,
+          dob: ageDOBError,
+        }))
+      } else {
+        // Clear errors if they now match
+        setErrors((prev) => {
+          const newErrors = { ...prev }
+          if (prev.age === ageDOBError || prev.age?.includes('do not match')) {
+            delete newErrors.age
+          }
+          if (prev.dob === ageDOBError || prev.dob?.includes('do not match')) {
+            delete newErrors.dob
+          }
+          return newErrors
+        })
+      }
+    }
+  }
+
+  const initials = useMemo(() => {
+    if (!values.fullName) return 'NM'
+    return values.fullName
+      .split(' ')
+      .map((part) => part.charAt(0)?.toUpperCase())
+      .slice(0, 2)
+      .join('')
+  }, [values.fullName])
+
+  const steps = [
+    {
+      id: 1,
+      title: 'Personal Information',
+      description: 'Tell us about yourself',
+      icon: <FiUser className="step-icon" />,
+      fields: ['fullName', 'age', 'dob', 'nationality', 'maritalStatus'],
+    },
+    {
+      id: 2,
+      title: 'Contact Details',
+      description: 'How can we reach you?',
+      icon: <FiPhone className="step-icon" />,
+      fields: ['phoneNumber', 'altPhoneNumber', 'residence', 'gpsAddress'],
+    },
+    {
+      id: 3,
+      title: 'Church Information',
+      description: 'Your journey with us',
+      icon: <FiHome className="step-icon" />,
+      fields: ['joiningDate', 'avatar'],
+    },
+  ]
+
+  const currentStepData = steps.find(step => step.id === currentStep)
+  const isFirstStep = currentStep === 1
+  const isLastStep = currentStep === steps.length
+
+  const handleNext = () => {
+    const currentStepFields = steps.find(step => step.id === currentStep)?.fields || []
+    const currentStepErrors = {}
+
+    currentStepFields.forEach(field => {
+      // Skip validation for optional fields
+      if (field === 'altPhoneNumber' || field === 'avatar' || field === 'age') return
+
+      // Skip marital status validation for minors
+      if (field === 'maritalStatus' && isMinor) return
+
+      if (!values[field]) {
+        currentStepErrors[field] = 'This field is required'
+      }
+    })
+
+    if (Object.keys(currentStepErrors).length > 0) {
+      setErrors(currentStepErrors)
+      return
+    }
+
+    if (currentStep < steps.length) {
+      setCurrentStep(prev => prev + 1)
+    }
+  }
+
+  const handlePrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1)
+    }
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setIsSubmitting(true)
+
+    if (!validate()) {
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      const payload = { ...values, age: Number(values.age) }
+      if (isMinor) {
+        payload.maritalStatus = ''
+      }
+
+      await onSubmit(payload)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="step-content">
+            <div className="form-group">
+              <ImageInput
+                label="Profile Picture"
+                name="avatar"
+                value={values.avatar}
+                onChange={handleChange}
+                error={errors.avatar}
+              />
+              <TextInput
+                label="Full Name"
+                name="fullName"
+                value={values.fullName}
+                onChange={handleChange}
+                required
+                error={errors.fullName}
+                icon={<FiUser />}
+                placeholder="John Doe"
+              />
+              <div className="form-row">
+                <TextInput
+                  label="Age"
+                  name="age"
+                  type="number"
+                  value={values.age}
+                  onChange={handleChange}
+                  min={1}
+                  error={errors.age}
+                  className="small-input"
+                />
+                <CustomDatePicker
+                  label="Date of Birth"
+                  name="dob"
+                  value={values.dob}
+                  onChange={handleChange}
+                  required
+                  max={today}
+                  error={errors.dob}
+                  placeholder="Select Date of Birth"
+                />
+              </div>
+              <TextInput
+                label="Nationality"
+                name="nationality"
+                value={values.nationality}
+                onChange={handleChange}
+                required
+                error={errors.nationality}
+                placeholder="e.g., Ghanaian"
+              />
+              {!isMinor && (
+                <CustomSelect
+                  label="Marital Status"
+                  name="maritalStatus"
+                  value={values.maritalStatus}
+                  onChange={handleChange}
+                  required
+                  options={MARITAL_STATUS_OPTIONS}
+                  error={errors.maritalStatus}
+                  icon={<FiUser />}
+                />
+              )}
+            </div>
+          </div>
+        )
+      case 2:
+        return (
+          <div className="step-content">
+            <div className="form-group">
+              <TextInput
+                label="Phone Number"
+                name="phoneNumber"
+                value={values.phoneNumber}
+                onChange={handleChange}
+                required
+                error={errors.phoneNumber}
+                placeholder="+233552215589"
+                icon={<FiPhone />}
+              />
+              <TextInput
+                label="Alternative Phone Number (Optional)"
+                name="altPhoneNumber"
+                value={values.altPhoneNumber}
+                onChange={handleChange}
+                error={errors.altPhoneNumber}
+                placeholder="+233552215580"
+                icon={<FiPhone />}
+              />
+              <TextInput
+                label="Residence"
+                name="residence"
+                value={values.residence}
+                onChange={handleChange}
+                required
+                error={errors.residence}
+                placeholder="Your current address"
+                icon={<FiHome />}
+              />
+              <TextInput
+                label="GPS Address"
+                name="gpsAddress"
+                value={values.gpsAddress}
+                onChange={handleChange}
+                required
+                error={errors.gpsAddress}
+                placeholder="e.g., AB-1234-5678"
+                icon={<FiMapPin />}
+              />
+            </div>
+          </div>
+        )
+      case 3:
+        return (
+          <div className="step-content">
+            <div className="form-group">
+              <CustomDatePicker
+                label="Date of Joining"
+                name="joiningDate"
+                value={values.joiningDate}
+                onChange={handleChange}
+                required
+                max={today}
+                error={errors.joiningDate}
+                placeholder="Select Date of Joining"
+              />
+              <div className="form-note">
+                <FiInfo className="info-icon" />
+                <p>This helps us keep track of your membership duration and anniversary.</p>
+              </div>
+              <div className="form-section">
+                <label className="form-label">Profile Picture (Optional)</label>
+                <ImageInput
+                  name="avatar"
+                  value={values.avatar}
+                  onChange={handleChange}
+                  error={errors.avatar}
+                  className="avatar-upload"
+                />
+              </div>
+            </div>
+          </div>
+        )
+
+          < div className = "form-actions" >
+            {!isFirstStep && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handlePrev}
+                disabled={isSubmitting}
+              >
+                <FiChevronLeft /> Back
+              </button>
+            )
+    }
+
+    <div className="form-actions-right">
+      {!isLastStep ? (
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleNext}
+          disabled={isSubmitting}
+        >
+          Next <FiChevronRight />
+        </button>
+      ) : (
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <span className="spinner"></span> Submitting...
+            </>
+          ) : (
+            submitLabel
+          )}
+        </button>
+      )}
+    </div>
+        </div >
+      </form >
+  { renderReviewModal() }
+    </div >
+  )
+}
+
+MemberForm.propTypes = {
+  initialValues: PropTypes.shape({
+    fullName: PropTypes.string,
+    age: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    dob: PropTypes.string,
+    residence: PropTypes.string,
+    gpsAddress: PropTypes.string,
+    phoneNumber: PropTypes.string,
+    altPhoneNumber: PropTypes.string,
+    nationality: PropTypes.string,
+    maritalStatus: PropTypes.string,
+    joiningDate: PropTypes.string,
+    avatar: PropTypes.string,
+  }),
+  onSubmit: PropTypes.func.isRequired,
+  submitLabel: PropTypes.string.isRequired,
+  isSaving: PropTypes.bool,
+}
+
+export default MemberForm
+
