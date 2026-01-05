@@ -17,8 +17,45 @@
   justify-content: space-between;
   padding: 2.5rem 2rem;
   overflow-y: auto;
-  z-index: 100;
+  z-index: 1000;
+  transition: transform 0.3s ease;
 }
+
+.app-shell__menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.app-shell__overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 950;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 
 .app-sidebar {
   display: flex;
@@ -26,6 +63,13 @@
   gap: 1.75rem;
   height: 100%;
 }
+
+@media (max-width: 960px) {
+  .app-sidebar {
+    padding-top: 1.5rem;
+  }
+}
+
 
 .app-sidebar__eyebrow {
   text-transform: uppercase;
@@ -200,13 +244,26 @@
 }
 
 @media (max-width: 960px) {
+  .app-shell__menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .app-shell__sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
+    transform: translateX(-100%);
+  }
+
+  .app-shell__sidebar--open {
+    transform: translateX(0);
+  }
+
+  .app-shell__overlay {
+    display: block;
   }
 
   .app-shell__content {
-    margin-left: 0;
+    margin-left: 0 !important;
+    padding-top: 4rem;
   }
 }

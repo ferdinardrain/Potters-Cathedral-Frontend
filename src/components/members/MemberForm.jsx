@@ -232,7 +232,7 @@ const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel, isSa
           <div className="step-content">
             <div className="form-group">
               <ImageInput
-                label="Profile Picture"
+                label="Profile Picture (Optional)"
                 name="avatar"
                 value={values.avatar}
                 onChange={handleChange}
@@ -259,7 +259,7 @@ const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel, isSa
                   error={errors.age}
                   className="small-input"
                 />
-                <CustomDatePicker
+                <DateInput
                   label="Date of Birth"
                   name="dob"
                   value={values.dob}

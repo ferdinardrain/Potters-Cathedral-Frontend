@@ -4,6 +4,8 @@ import { memberService } from '../services/memberService'
 const defaultFilters = {
   search: '',
   maritalStatus: '',
+  minAge: '',
+  maxAge: '',
 }
 
 export const useMembers = () => {

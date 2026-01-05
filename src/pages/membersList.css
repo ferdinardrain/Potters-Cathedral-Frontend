@@ -71,6 +71,19 @@
   gap: 1rem;
 }
 
+@media (max-width: 640px) {
+  .members-list__filter-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .members-list__search {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+
 /* Hide labels in filter context for cleaner look */
 .members-list__filters .form-control__label {
   display: none;
@@ -340,5 +353,164 @@
   .members-list__pagination {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+/* Responsive Table Styles for Mobile */
+@media (max-width: 768px) {
+  .members-list__table-wrapper {
+    border: none;
+    box-shadow: none;
+    overflow-x: visible;
+    max-height: none;
+  }
+
+  .members-list__table thead {
+    display: none;
+  }
+
+  .members-list__table,
+  .members-list__table tbody,
+  .members-list__table tr,
+  .members-list__table td {
+    display: block;
+    width: 100%;
+  }
+
+  .members-list__table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .members-list__table td {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    position: relative;
+    padding-left: 45%;
+    white-space: normal;
+    max-width: none;
+  }
+
+  .members-list__table td:last-child {
+    border-bottom: none;
+  }
+
+  .members-list__table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    width: 40%;
+    padding-right: 0.5rem;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Avatar cell special styling */
+  .members-list__table td:first-child {
+    padding: 1rem !important;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .members-list__table td:first-child:before {
+    display: none;
+  }
+
+  .members-list__avatar {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto !important;
+    display: block;
+  }
+
+  .members-list__avatar-placeholder {
+    font-size: 1.25rem;
+  }
+
+  /* Member name - make it prominent */
+  .members-list__table td:nth-child(2) {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    background: #f9fafb;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Actions cell */
+  .members-list__table td:last-child {
+    padding: 1rem;
+    background: #f9fafb;
+  }
+
+  .members-list__table td:last-child:before {
+    content: 'Actions';
+  }
+
+  .members-list__action-group {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .members-list__action {
+    width: 40px;
+    height: 40px;
+  }
+
+  .members-list__action svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Status chip */
+  .members-list__chip {
+    display: inline-block;
+  }
+
+  /* GPS address - allow wrapping */
+  .members-list__gps {
+    max-width: none;
+    word-break: break-word;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .members-list__actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .members-list__export-btn,
+  .members-list__new-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .members-list__table td {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .members-list__table td:before {
+    position: static;
+    display: block;
+    width: 100%;
+    margin-bottom: 0.25rem;
+    padding-right: 0;
+  }
+
+  .members-list__table td:nth-child(2) {
+    text-align: center;
   }
 }

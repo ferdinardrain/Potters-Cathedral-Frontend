@@ -13,6 +13,23 @@
   background-repeat: no-repeat;
 }
 
+@media (max-width: 1024px) {
+  .login {
+    padding-right: 15%;
+    background-size: 35%;
+  }
+}
+
+@media (max-width: 768px) {
+  .login {
+    justify-content: center;
+    padding-right: 0;
+    background-image: none;
+    padding: 20px;
+  }
+}
+
+
 .login__background {
   position: absolute;
   inset: 0;

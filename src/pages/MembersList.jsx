@@ -19,25 +19,25 @@ const MembersList = () => {
   // Track previous pathname to detect navigation
   const prevPathnameRef = useRef(location.pathname)
 
-  // Reload members when navigating from registration page or when pathname changes
+  // Handle initial filters from navigation state
   useEffect(() => {
     const refreshFlag = location.state?.refresh
-    const pathnameChanged = prevPathnameRef.current !== location.pathname
+    const initialFilters = location.state?.filters
 
-    if (refreshFlag || pathnameChanged) {
-      // Reload members when coming from registration or when navigating to this page
-      const timer = setTimeout(() => {
-        reload()
-        // Clear the refresh flag if present
-        if (refreshFlag) {
-          window.history.replaceState({}, document.title, location.pathname)
-        }
-      }, 200)
-
-      prevPathnameRef.current = location.pathname
-      return () => clearTimeout(timer)
+    if (initialFilters) {
+      setFilters(initialFilters)
+      // Clear history state to avoid re-applying on every render
+      window.history.replaceState({}, document.title, location.pathname)
+    } else if (refreshFlag) {
+      reload()
+      // Clear history state
+      window.history.replaceState({}, document.title, location.pathname)
+    } else if (prevPathnameRef.current !== location.pathname) {
+      reload()
     }
-  }, [location.pathname, location.state?.refresh, reload])
+
+    prevPathnameRef.current = location.pathname
+  }, [location.pathname, location.state, reload, setFilters])
 
   const rows = useMemo(() => {
     return members.map((member) => ({
@@ -219,7 +219,7 @@ const MembersList = () => {
                 const statusColor = getStatusColor(row.maritalStatus)
                 return (
                   <tr key={row.id}>
-                    <td>
+                    <td data-label="Avatar">
                       <div className="members-list__avatar">
                         {row.avatar ? (
                           <img src={row.avatar} alt={row.fullName} />
@@ -230,15 +230,15 @@ const MembersList = () => {
                         )}
                       </div>
                     </td>
-                    <td className="members-list__name">{row.fullName || '—'}</td>
-                    <td>{row.age || '—'}</td>
-                    <td className="members-list__date">{row.dob || '—'}</td>
-                    <td>{row.phoneNumber || '—'}</td>
-                    <td>{row.altPhoneNumber || '—'}</td>
-                    <td>{row.residence || '—'}</td>
-                    <td className="members-list__gps">{row.gpsAddress || '—'}</td>
-                    <td>{row.nationality || '—'}</td>
-                    <td>
+                    <td data-label="Member" className="members-list__name">{row.fullName || '—'}</td>
+                    <td data-label="Age">{row.age || '—'}</td>
+                    <td data-label="DOB" className="members-list__date">{row.dob || '—'}</td>
+                    <td data-label="Phone">{row.phoneNumber || '—'}</td>
+                    <td data-label="Alt Phone">{row.altPhoneNumber || '—'}</td>
+                    <td data-label="Residence">{row.residence || '—'}</td>
+                    <td data-label="GPS Address" className="members-list__gps">{row.gpsAddress || '—'}</td>
+                    <td data-label="Nationality">{row.nationality || '—'}</td>
+                    <td data-label="Status">
                       <span
                         className="members-list__chip"
                         style={{
@@ -248,8 +248,8 @@ const MembersList = () => {
                         {row.maritalStatus || '—'}
                       </span>
                     </td>
-                    <td className="members-list__date">{row.joiningDate || '—'}</td>
-                    <td>
+                    <td data-label="Joined" className="members-list__date">{row.joiningDate || '—'}</td>
+                    <td data-label="Actions">
                       <div className="members-list__action-group">
                         <button
                           type="button"

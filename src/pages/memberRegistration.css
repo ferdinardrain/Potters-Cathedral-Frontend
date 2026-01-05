@@ -8,6 +8,20 @@
     border-radius: 1rem;
 }
 
+@media (max-width: 768px) {
+    .registration-page {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .registration-page {
+        padding: 0.25rem;
+    }
+}
+
+
+
 .registration__background {
     position: absolute;
     inset: 0;
@@ -66,6 +80,63 @@
     max-width: 900px;
     margin: 0 auto;
 }
+
+.registration__close-btn {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 40px;
+    height: 40px;
+    background: #ef4444;
+    color: white;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.registration__close-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.registration__close-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 768px) {
+    .registration__close-btn {
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 32px;
+        height: 32px;
+        border-width: 2px;
+    }
+}
+
+
+
+@media (max-width: 768px) {
+    .registration__card {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .registration__card {
+        padding: 1rem 0.5rem;
+    }
+}
+
+
 
 /* Overrides for MemberForm components to match Login theme */
 /* Overrides for MemberForm components to match Login theme */

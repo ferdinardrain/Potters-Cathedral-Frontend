@@ -23,10 +23,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.5;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.1);
@@ -49,9 +52,11 @@
   padding: 2rem;
   color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  user-select: none;
 }
 
 .overview__card::before {
@@ -67,7 +72,19 @@
 
 .overview__card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
+  filter: brightness(1.1);
+}
+
+.overview__card:active {
+  transform: translateY(-2px) scale(0.98);
+  filter: brightness(1.05);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.overview__card:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .overview__card-title {
@@ -115,4 +132,3 @@
     font-size: 2.5rem;
   }
 }
-

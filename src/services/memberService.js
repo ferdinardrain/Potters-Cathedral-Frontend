@@ -76,6 +76,14 @@ const filterMembers = (members, filters) => {
     )
   }
 
+  // Age filters
+  if (filters.minAge !== undefined && filters.minAge !== null && filters.minAge !== '') {
+    filtered = filtered.filter((member) => Number(member.age) >= Number(filters.minAge))
+  }
+  if (filters.maxAge !== undefined && filters.maxAge !== null && filters.maxAge !== '') {
+    filtered = filtered.filter((member) => Number(member.age) <= Number(filters.maxAge))
+  }
+
   return filtered
 }
 
@@ -98,10 +106,11 @@ export const memberService = {
       }
     }
 
-    // Use localStorage as primary storage for frontend-only mode
+    // Use localStorage as primary storage for frontend-only mode or fallback
     const members = getMembersFromStorage()
+    // In local mode, we still need to filter here because this specific local storage 
+    // implementation doesn't have a real SQL engine.
     const filtered = filterMembers(members, filters)
-    // Normalize all members to ensure consistent data structure
     return filtered.map(normalizeMember)
   },
 
@@ -169,6 +178,37 @@ export const memberService = {
     saveMembersToStorage(members)
     console.log('Member saved to localStorage:', newMember)
     return normalizeMember(newMember)
+  },
+
+  async fetchStats() {
+    const useAPI = true
+    if (useAPI) {
+      try {
+        const response = await apiClient.get('/api/members/stats')
+        if (response?.data) {
+          return response.data
+        }
+      } catch (error) {
+        console.log('API stats unavailable, falling back to local calculation')
+      }
+    }
+
+    // Fallback: calculate stats from localStorage
+    const members = getMembersFromStorage()
+    const kids = members.filter((m) => Number(m.age) <= 18).length
+    const adults = members.filter((m) => Number(m.age) > 18).length
+    const singles = members.filter((m) => m.maritalStatus?.toLowerCase() === 'single').length
+    const married = members.filter((m) => m.maritalStatus?.toLowerCase() === 'married').length
+    const widowed = members.filter((m) => m.maritalStatus?.toLowerCase() === 'widowed').length
+
+    return {
+      total: members.length,
+      kids,
+      adults,
+      singles,
+      married,
+      widows: widowed, // Keep property name consistent with backend
+    }
   },
 
   async updateMember(memberId, payload) {
