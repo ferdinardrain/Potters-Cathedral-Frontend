@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://potters-cathedral-backend.onrender.com'
 
 const handleResponse = async (response) => {
   const data = await response.json().catch(() => ({}))
