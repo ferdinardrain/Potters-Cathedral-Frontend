@@ -11,7 +11,7 @@ const Settings = () => {
   const { user, updateUser } = useAuth()
 
   const [churchInfo, setChurchInfo] = useState({
-    churchName: 'LDS HUB',
+    churchName: '',
     pastorName: '',
     churchAddress: '',
     churchPhone: '',
@@ -23,13 +23,12 @@ const Settings = () => {
     ageThreshold: 18,
     requirePhoneNumber: true,
     requireGPSAddress: false,
-    defaultNationality: 'Ghanaian',
   })
 
   const [userProfile, setUserProfile] = useState({
-    userName: 'Lydia Mensah',
-    userRole: 'Program director',
-    userAffiliation: 'IMPACT HUB',
+    userName: '',
+    userRole: '',
+    userAffiliation: '',
     avatar: '',
   })
 
@@ -63,7 +62,9 @@ const Settings = () => {
     const savedProfile = localStorage.getItem('userProfile')
     if (savedProfile) {
       try {
-        setUserProfile(JSON.parse(savedProfile))
+        const parsedProfile = JSON.parse(savedProfile)
+        // Ensure userName and userRole start empty to show placeholders
+        setUserProfile({ ...parsedProfile, userName: '', userRole: '' })
       } catch (error) {
         console.error('Failed to load profile:', error)
       }
@@ -71,8 +72,8 @@ const Settings = () => {
       // Initialize from auth user if no local profile saved
       setUserProfile(prev => ({
         ...prev,
-        userName: user.username || prev.userName,
-        userRole: user.role || prev.userRole,
+        // userName: user.username || prev.userName, // Keep empty to show placeholder
+        // userRole: user.role || prev.userRole, // Keep empty to show placeholder
         avatar: user.avatar || prev.avatar,
         userAffiliation: user.affiliation || prev.userAffiliation
       }))
@@ -137,13 +138,17 @@ const Settings = () => {
     // Start by saving to specific local storage key for Settings page persistence
     localStorage.setItem('userProfile', JSON.stringify(userProfile))
 
-    // Also update global auth context so Sidebar updates immediately
-    updateUser({
-      username: userProfile.userName,
-      role: userProfile.userRole,
-      avatar: userProfile.avatar,
-      affiliation: userProfile.userAffiliation
-    })
+    // Only update auth context with non-empty values to prevent sidebar from showing defaults
+    const updates = {}
+    if (userProfile.userName) updates.username = userProfile.userName
+    if (userProfile.userRole) updates.role = userProfile.userRole
+    if (userProfile.avatar) updates.avatar = userProfile.avatar
+    if (userProfile.userAffiliation) updates.affiliation = userProfile.userAffiliation
+
+    // Only call updateUser if there are actual updates
+    if (Object.keys(updates).length > 0) {
+      updateUser(updates)
+    }
 
     await Swal.fire({
       icon: 'success',
@@ -165,15 +170,49 @@ const Settings = () => {
     })
   }
 
+  const handleClearProfile = async () => {
+    const result = await Swal.fire({
+      title: 'Clear Profile?',
+      text: 'This will remove your name, role, avatar, and affiliation from the sidebar. Are you sure?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, clear it',
+      cancelButtonText: 'Cancel'
+    })
+
+    if (result.isConfirmed) {
+      // Clear the profile state
+      setUserProfile({
+        userName: '',
+        userRole: '',
+        userAffiliation: '',
+        avatar: '',
+      })
+
+      // Clear from localStorage
+      localStorage.removeItem('userProfile')
+
+      // Clear from auth context (this updates the sidebar)
+      updateUser({
+        username: '',
+        role: '',
+        avatar: '',
+        affiliation: ''
+      })
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Profile Cleared!',
+        text: 'Your profile has been reset to defaults.',
+        confirmButtonColor: '#3b82f6',
+        timer: 2000,
+      })
+    }
+  }
 
 
-  const nationalityOptions = [
-    { value: 'Ghanaian', label: 'Ghanaian' },
-    { value: 'Nigerian', label: 'Nigerian' },
-    { value: 'Kenyan', label: 'Kenyan' },
-    { value: 'South African', label: 'South African' },
-    { value: 'Other', label: 'Other' },
-  ]
 
   return (
     <PageLayout>
@@ -271,13 +310,6 @@ const Settings = () => {
                 min={1}
                 max={25}
               />
-              <CustomSelect
-                label="Default Nationality"
-                name="defaultNationality"
-                value={memberSettings.defaultNationality}
-                onChange={handleMemberSettingsChange}
-                options={nationalityOptions}
-              />
             </div>
             <div className="settings__options">
               <label className="settings__option">
@@ -342,12 +374,14 @@ const Settings = () => {
                 name="userName"
                 value={userProfile.userName}
                 onChange={handleProfileChange}
+                placeholder="Kwame Appiah"
               />
               <TextInput
                 label="Role/Position"
                 name="userRole"
                 value={userProfile.userRole}
                 onChange={handleProfileChange}
+                placeholder="Program Director"
               />
               <TextInput
                 label="Affiliation"
@@ -359,6 +393,9 @@ const Settings = () => {
             <div className="settings__actions">
               <button type="button" className="settings__button settings__button--primary" onClick={handleSaveProfile}>
                 Save Profile
+              </button>
+              <button type="button" className="settings__button settings__button--secondary" onClick={handleClearProfile}>
+                Clear Profile
               </button>
             </div>
           </div>

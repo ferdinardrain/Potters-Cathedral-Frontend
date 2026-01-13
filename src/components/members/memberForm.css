@@ -77,6 +77,7 @@
 /* Form Content */
 .registration-form {
   padding: 2.5rem 3rem;
+  overflow: visible !important;
 }
 
 .form-header {
@@ -101,6 +102,11 @@
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+  overflow: visible !important;
+}
+
+.step-content {
+  overflow: visible !important;
 }
 
 .form-row {
@@ -113,10 +119,10 @@
   flex: 1;
 }
 
-
 /* Form Groups */
 .form-group {
   margin-bottom: 1.25rem;
+  overflow: visible !important;
 }
 
 .form-group label {
@@ -125,23 +131,6 @@
   font-weight: 500;
   color: #475569;
   margin-bottom: 0.5rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 0.9375rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
-  transition: all 0.2s ease;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #a5b4fc;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  background: white;
 }
 
 /* Buttons */
@@ -275,8 +264,6 @@
     font-size: 1.25rem !important;
   }
 
-
-
   .form-row {
     flex-direction: column;
     gap: 1.25rem;
@@ -303,7 +290,6 @@
   }
 }
 
-
 /* Error States */
 .error-message {
   color: #dc2626;
@@ -317,10 +303,6 @@
 /* Input with Icon */
 .input-with-icon {
   position: relative;
-}
-
-.input-with-icon .form-control {
-  padding-left: 2.5rem;
 }
 
 .input-icon {

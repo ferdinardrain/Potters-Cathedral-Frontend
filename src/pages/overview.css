@@ -114,10 +114,16 @@
 @media (max-width: 768px) {
   .overview__grid {
     grid-template-columns: 1fr;
+    justify-items: center;
+    /* Center grid items */
   }
 
   .overview__card {
     padding: 1.5rem;
+    width: 100%;
+    max-width: 400px;
+    /* Prevent cards from being too wide on tablet-sized screens */
+    margin: 0 auto;
   }
 
   .overview__card-value {
@@ -126,6 +132,8 @@
 
   .overview__card--total {
     grid-column: 1;
+    max-width: none;
+    /* Let total card be full width of its container */
   }
 
   .overview__card--total .overview__card-value {

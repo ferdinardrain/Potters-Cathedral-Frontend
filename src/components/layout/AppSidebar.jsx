@@ -1,11 +1,13 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import Swal from 'sweetalert2'
 import { useAuth } from '../../context/authContext'
 import './appSidebar.css'
 
 const NAV_ITEMS = [
   { label: 'Overview', path: '/overview', icon: 'home' },
   { label: 'Members', path: '/members', icon: 'users' },
+  { label: 'Trash', path: '/members/trash', icon: 'trash' },
   { label: 'Settings', path: '/settings', icon: 'settings' },
 ]
 
@@ -14,9 +16,24 @@ const AppSidebar = () => {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: 'Log Out?',
+      text: 'Are you sure you want to end your session?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#764ba2',
+      cancelButtonColor: '#e5e7eb',
+      confirmButtonText: 'Yes, logout',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#1f2937'
+    })
+
+    if (result.isConfirmed) {
+      logout()
+      navigate('/login')
+    }
   }
 
   const getIcon = (iconName) => {
@@ -49,6 +66,13 @@ const AppSidebar = () => {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="3" />
             <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
+          </svg>
+        )
+      case 'trash':
+        return (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
         )
       default:
@@ -91,8 +115,9 @@ const AppSidebar = () => {
 
       <nav className="app-sidebar__nav">
         {NAV_ITEMS.map((item) => {
-          const isActive = location.pathname === item.path ||
-            (item.path === '/members' && location.pathname.startsWith('/members'))
+          const isActive = item.path === '/members'
+            ? (location.pathname === '/members' || (location.pathname.startsWith('/members/') && location.pathname !== '/members/trash'))
+            : location.pathname === item.path
           return (
             <NavLink
               key={item.label}

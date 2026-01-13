@@ -1,25 +1,15 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://potter-s-cathedral-backend.onrender.com
-
-'
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 const handleResponse = async (response) => {
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
-    const message = data?.message || 'Unable to process request'
+    const message = data?.message || data?.error || 'Unable to process request'
     throw new Error(message)
   }
   return data
 }
 
 const handleFetchError = (error) => {
-  // Suppress "Failed to fetch" messages - return empty data silently
-  // Don't log or throw errors for connection refused (no backend)
-  if (error.message === 'Failed to fetch' || 
-      error.message.toLowerCase().includes('failed to fetch') ||
-      error.message.includes('ERR_CONNECTION_REFUSED')) {
-    // Return empty response to prevent error display
-    return Promise.resolve({ data: [] })
-  }
+  console.error('API Connection Error:', error)
   throw error
 }
 
@@ -64,5 +54,15 @@ export const apiClient = {
       return handleFetchError(error)
     }
   },
-}
 
+  async delete(path) {
+    try {
+      const response = await fetch(`${API_BASE}${path}`, {
+        method: 'DELETE',
+      })
+      return handleResponse(response)
+    } catch (error) {
+      return handleFetchError(error)
+    }
+  },
+}

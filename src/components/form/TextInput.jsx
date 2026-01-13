@@ -10,38 +10,47 @@ const TextInput = ({
   placeholder,
   required,
   error,
+  icon,
+  hideLabel = false,
   ...rest
 }) => {
   return (
-    <label className="form-control">
-      <span className="form-control__label">
-        {label} {required && <sup>*</sup>}
-      </span>
-      <input
-        className={`form-control__input ${error ? 'form-control__input--error' : ''} ${rest.className || ''}`}
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        {...rest}
-      />
+    <div className={`form-control ${rest.className || ''}`}>
+      {label && !hideLabel && (
+        <label className="form-control__label">
+          {label} {required && <sup>*</sup>}
+        </label>
+      )}
+      <div className={`form-control__input-wrapper ${icon ? 'form-control__input-wrapper--with-icon' : ''}`}>
+        {icon && <span className="form-control__icon">{icon}</span>}
+        <input
+          className={`form-control__input ${error ? 'form-control__input--error' : ''} ${rest.className || ''}`}
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          autoComplete="off"
+          {...rest}
+        />
+      </div>
       {error && <span className="form-control__error">{error}</span>}
-    </label>
+    </div>
   )
 }
 
 TextInput.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   name: PropTypes.string.isRequired,
   type: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   required: PropTypes.bool,
   error: PropTypes.string,
+  icon: PropTypes.node,
+  hideLabel: PropTypes.bool,
 }
 
 export default TextInput
-

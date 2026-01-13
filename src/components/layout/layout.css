@@ -102,16 +102,27 @@
     height: auto;
   }
 
+  .page__header {
+    text-align: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 1rem 0;
+  }
+
   .page__body {
     flex-direction: column;
     overflow-y: visible;
     padding-bottom: 1rem;
     gap: 1rem;
+    align-items: center;
+    /* Center children */
   }
 
   .page__content {
     padding: 1rem 0.75rem;
     border-radius: 1rem;
+    width: 100%;
+    margin: 0 auto;
   }
 
   .page__sidebar {
@@ -124,12 +135,15 @@
   .page__header-actions {
     width: 100%;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    /* Center buttons */
   }
 
   .page__actions {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    width: 100%;
+    align-items: center;
   }
 }

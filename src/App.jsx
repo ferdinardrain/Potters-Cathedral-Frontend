@@ -13,6 +13,7 @@ import MemberRegistration from './pages/MemberRegistration'
 import MembersList from './pages/MembersList'
 import MemberDetails from './pages/MemberDetails'
 import MemberEdit from './pages/MemberEdit'
+import TrashList from './pages/TrashList'
 import './App.css'
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/members" element={<ProtectedRoute><MembersList /></ProtectedRoute>} />
         <Route path="/members/new" element={<ProtectedRoute><MemberRegistration /></ProtectedRoute>} />
+        <Route path="/members/trash" element={<ProtectedRoute><TrashList /></ProtectedRoute>} />
         <Route path="/members/:memberId" element={<ProtectedRoute><MemberDetails /></ProtectedRoute>} />
         <Route path="/members/:memberId/edit" element={<ProtectedRoute><MemberEdit /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/overview" replace />} />

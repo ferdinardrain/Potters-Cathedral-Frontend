@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { apiClient } from '../services/apiClient';
 
 const AuthContext = createContext(null);
 
@@ -24,28 +25,19 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-            const response = await fetch(`${apiBase}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
+            const response = await apiClient.post('/api/auth/login', { username, password });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                return { success: false, error: data.error || 'Login failed' };
+            if (response.error || !response.success) {
+                return { success: false, error: response.error || 'Login failed' };
             }
 
-            const userData = { ...data.user, token: data.token };
+            const userData = { ...response.user, token: response.token };
             setIsAuthenticated(true);
             setUser(userData);
             localStorage.setItem('porters_auth', JSON.stringify({ user: userData }));
             return { success: true };
         } catch (error) {
-            return { success: false, error: 'Network error. Please try again.' };
+            return { success: false, error: error.message || 'Network error. Please try again.' };
         }
     };
 

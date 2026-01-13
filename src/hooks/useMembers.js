@@ -6,6 +6,7 @@ const defaultFilters = {
   maritalStatus: '',
   minAge: '',
   maxAge: '',
+  trash: false,
 }
 
 export const useMembers = () => {
@@ -22,10 +23,7 @@ export const useMembers = () => {
       const data = await memberService.fetchMembers(filtersToUse)
       setMembers(data)
     } catch (err) {
-      // Suppress "Failed to fetch" messages
-      if (err.message && !err.message.toLowerCase().includes('failed to fetch')) {
-        setError(err.message || 'Failed to load members')
-      }
+      setError(err.message || 'Failed to load members')
     } finally {
       setLoading(false)
     }
@@ -40,6 +38,36 @@ export const useMembers = () => {
     loadMembers(filters)
   }, [loadMembers, filters])
 
+  const deleteMember = async (id) => {
+    try {
+      await memberService.deleteMember(id)
+      reload()
+    } catch (err) {
+      setError(err.message || 'Failed to delete member')
+      throw err
+    }
+  }
+
+  const restoreMember = async (id) => {
+    try {
+      await memberService.restoreMember(id)
+      reload()
+    } catch (err) {
+      setError(err.message || 'Failed to restore member')
+      throw err
+    }
+  }
+
+  const permanentlyDeleteMember = async (id) => {
+    try {
+      await memberService.permanentlyDeleteMember(id)
+      reload()
+    } catch (err) {
+      setError(err.message || 'Failed to permanently delete member')
+      throw err
+    }
+  }
+
   return {
     members,
     loading,
@@ -47,6 +75,9 @@ export const useMembers = () => {
     filters,
     setFilters,
     reload,
+    deleteMember,
+    restoreMember,
+    permanentlyDeleteMember,
   }
 }
 

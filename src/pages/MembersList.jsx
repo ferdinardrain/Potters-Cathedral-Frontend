@@ -8,12 +8,13 @@ import CustomSelect from '../components/form/CustomSelect'
 import MemberDetailsModal from '../components/members/MemberDetailsModal'
 import { useMembers } from '../hooks/useMembers'
 import { memberService, MARITAL_STATUS_FILTER_OPTIONS } from '../services/memberService'
+import { exportService } from '../services/exportService'
 import './membersList.css'
 
 const MembersList = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { members, loading, error, filters, setFilters, reload } = useMembers()
+  const { members, loading, error, filters, setFilters, reload, deleteMember } = useMembers()
   const [selectedMember, setSelectedMember] = useState(null)
 
   // Track previous pathname to detect navigation
@@ -72,45 +73,70 @@ const MembersList = () => {
     return colors[status] || { bg: '#f3f4f6', text: '#6b7280' }
   }
 
-  const handleExport = () => {
-    // Export functionality - can be implemented later
-    Swal.fire({
-      icon: 'info',
-      title: 'Export',
-      text: 'Export functionality will be available soon.',
-      confirmButtonColor: '#3b82f6',
-    })
+  const [showExportMenu, setShowExportMenu] = useState(false)
+  const exportMenuRef = useRef(null)
+
+  // Handle click outside to close export menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
+        setShowExportMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleExport = (format) => {
+    setShowExportMenu(false)
+    const exportColumns = [
+      { header: 'Full Name', key: 'fullName' },
+      { header: 'Age', key: 'age' },
+      { header: 'DOB', key: 'dob' },
+      { header: 'Phone', key: 'phoneNumber' },
+      { header: 'Residence', key: 'residence' },
+      { header: 'GPS Address', key: 'gpsAddress' },
+      { header: 'Nationality', key: 'nationality' },
+      { header: 'Status', key: 'maritalStatus' },
+      { header: 'Joining Date', key: 'joiningDate' },
+    ]
+
+    switch (format) {
+      case 'pdf':
+        // Pass the full memoized 'rows' which includes the 'avatar' property
+        exportService.exportToPDF(rows, { title: 'Church Members List', fileName: 'Members_List', columns: exportColumns })
+        break
+      case 'excel':
+        exportService.exportToExcel(rows, { fileName: 'Members_List', columns: exportColumns })
+        break
+      case 'csv':
+        exportService.exportToCSV(rows, { fileName: 'Members_List', columns: exportColumns })
+        break
+      default:
+        break
+    }
   }
 
   const handleDelete = async (memberId, memberName) => {
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: `Do you want to delete ${memberName}? This action cannot be undone.`,
+      title: 'Move to Trash?',
+      text: `Do you want to move ${memberName} to the trash? You can restore them later.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonText: 'Yes, move to trash',
       cancelButtonText: 'Cancel',
     })
 
     if (result.isConfirmed) {
       try {
-        // Delete from localStorage (since we're using frontend-only storage)
-        const members = JSON.parse(localStorage.getItem('church_members') || '[]')
-        const filtered = members.filter((m) => m.id !== memberId && m.id !== String(memberId))
-        localStorage.setItem('church_members', JSON.stringify(filtered))
-
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new CustomEvent('memberUpdated'))
-
-        // Reload the members list
-        reload()
+        await deleteMember(memberId)
 
         await Swal.fire({
           icon: 'success',
-          title: 'Deleted!',
-          text: `${memberName} has been deleted.`,
+          title: 'Moved to Trash!',
+          text: `${memberName} has been moved to the trash.`,
           confirmButtonColor: '#3b82f6',
           timer: 2000,
         })
@@ -118,11 +144,23 @@ const MembersList = () => {
         await Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to delete member. Please try again.',
+          text: 'Failed to move member to trash. Please try again.',
           confirmButtonColor: '#ef4444',
         })
       }
     }
+  }
+
+  const handleViewImage = (avatar, name) => {
+    if (!avatar) return
+    Swal.fire({
+      title: name,
+      imageUrl: avatar,
+      imageAlt: name,
+      showCloseButton: true,
+      showConfirmButton: false,
+      className: 'avatar-preview-modal',
+    })
   }
 
   return (
@@ -131,24 +169,64 @@ const MembersList = () => {
       subtitle="Track and manage church members"
       actions={
         <div className="members-list__actions">
-          <button type="button" className="members-list__export-btn" onClick={handleExport}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Export overview
-          </button>
+          <div className="members-list__export-wrapper" ref={exportMenuRef}>
+            <button
+              type="button"
+              className="members-list__export-btn"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Export
+            </button>
+
+            {showExportMenu && (
+              <div className="export-dropdown">
+                <button className="export-dropdown__item" onClick={() => handleExport('pdf')}>
+                  <div className="export-dropdown__icon export-dropdown__icon--pdf">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                  </div>
+                  PDF Document
+                </button>
+                <button className="export-dropdown__item" onClick={() => handleExport('excel')}>
+                  <div className="export-dropdown__icon export-dropdown__icon--excel">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <line x1="3" y1="9" x2="21" y2="9" />
+                      <line x1="9" y1="21" x2="9" y2="9" />
+                    </svg>
+                  </div>
+                  Excel Spreadsheet
+                </button>
+                <button className="export-dropdown__item" onClick={() => handleExport('csv')}>
+                  <div className="export-dropdown__icon export-dropdown__icon--csv">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <line x1="12" y1="18" x2="12" y2="12" />
+                      <line x1="9" y1="15" x2="15" y2="15" />
+                    </svg>
+                  </div>
+                  CSV Text File
+                </button>
+              </div>
+            )}
+          </div>
           <button
             type="button"
             className="members-list__new-btn"
             onClick={() => navigate('/members/new')}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            + New member
+            Add Member
           </button>
         </div>
       }
@@ -220,12 +298,16 @@ const MembersList = () => {
                 return (
                   <tr key={row.id}>
                     <td data-label="Avatar">
-                      <div className="members-list__avatar">
+                      <div
+                        className={`members-list__avatar ${row.avatar ? 'members-list__avatar--clickable' : ''}`}
+                        onClick={() => row.avatar && handleViewImage(row.avatar, row.fullName)}
+                        title={row.avatar ? 'Click to view full image' : ''}
+                      >
                         {row.avatar ? (
                           <img src={row.avatar} alt={row.fullName} />
                         ) : (
                           <div className="members-list__avatar-placeholder">
-                            {row.fullName?.charAt(0)?.toUpperCase() || '?'}
+                            {row.fullName ? row.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
                           </div>
                         )}
                       </div>
