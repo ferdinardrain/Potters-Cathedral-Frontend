@@ -45,6 +45,9 @@ export const apiClient = {
           url.searchParams.append(key, value)
         }
       })
+      // Cache busting
+      url.searchParams.append('_t', Date.now())
+
       const response = await fetch(url, {
         headers: getAuthHeaders()
       })
