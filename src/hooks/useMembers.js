@@ -40,9 +40,15 @@ export const useMembers = () => {
 
   const deleteMember = async (id) => {
     try {
+      // Optimistically remove from UI
+      setMembers(prevMembers => prevMembers.filter(member => member.id !== id))
+
       await memberService.deleteMember(id)
-      reload()
+
+      // Force fresh reload
+      await loadMembers(filters)
     } catch (err) {
+      await loadMembers(filters)
       setError(err.message || 'Failed to delete member')
       throw err
     }
@@ -50,9 +56,15 @@ export const useMembers = () => {
 
   const restoreMember = async (id) => {
     try {
+      // Optimistically remove from trash UI
+      setMembers(prevMembers => prevMembers.filter(member => member.id !== id))
+
       await memberService.restoreMember(id)
-      reload()
+
+      // Force fresh reload
+      await loadMembers(filters)
     } catch (err) {
+      await loadMembers(filters)
       setError(err.message || 'Failed to restore member')
       throw err
     }
@@ -60,9 +72,17 @@ export const useMembers = () => {
 
   const permanentlyDeleteMember = async (id) => {
     try {
+      // Optimistically remove from UI immediately
+      setMembers(prevMembers => prevMembers.filter(member => member.id !== id))
+
+      // Then call the backend
       await memberService.permanentlyDeleteMember(id)
-      reload()
+
+      // Force a fresh reload from the server to ensure sync
+      await loadMembers(filters)
     } catch (err) {
+      // If it fails, reload to restore correct state
+      await loadMembers(filters)
       setError(err.message || 'Failed to permanently delete member')
       throw err
     }
