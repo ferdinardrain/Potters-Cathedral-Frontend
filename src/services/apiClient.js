@@ -10,7 +10,26 @@ const handleResponse = async (response) => {
 
 const handleFetchError = (error) => {
   console.error('API Connection Error:', error)
+  if (error.message === 'Failed to fetch') {
+    throw new Error('Network error: Could not reach the server. Please check your internet connection or if the backend is live.')
+  }
   throw error
+}
+
+const getAuthHeaders = () => {
+  const headers = { 'Content-Type': 'application/json' }
+  try {
+    const authData = localStorage.getItem('porters_auth')
+    if (authData) {
+      const { user } = JSON.parse(authData)
+      if (user?.token) {
+        headers['Authorization'] = `Bearer ${user.token}`
+      }
+    }
+  } catch (error) {
+    console.error('Error reading auth token:', error)
+  }
+  return headers
 }
 
 export const apiClient = {
@@ -22,7 +41,10 @@ export const apiClient = {
           url.searchParams.append(key, value)
         }
       })
-      const response = await fetch(url)
+      const response = await fetch(url, {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      })
       return handleResponse(response)
     } catch (error) {
       return handleFetchError(error)
@@ -33,7 +55,8 @@ export const apiClient = {
     try {
       const response = await fetch(`${API_BASE}${path}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify(body),
       })
       return handleResponse(response)
@@ -46,7 +69,8 @@ export const apiClient = {
     try {
       const response = await fetch(`${API_BASE}${path}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
+        credentials: 'include',
         body: JSON.stringify(body),
       })
       return handleResponse(response)
@@ -59,6 +83,8 @@ export const apiClient = {
     try {
       const response = await fetch(`${API_BASE}${path}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include'
       })
       return handleResponse(response)
     } catch (error) {
