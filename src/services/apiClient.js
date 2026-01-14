@@ -14,8 +14,8 @@ const handleResponse = async (response) => {
 
 const handleFetchError = (error) => {
   console.error('API Connection Error:', error)
-  if (error.message === 'Failed to fetch') {
-    throw new Error('Network error: Could not reach the server. Please check your internet connection or if the backend is live.')
+  if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+    throw new Error(`Network error: Could not reach ${API_BASE}. Please check your internet connection or if the backend is live.`)
   }
   throw error
 }
