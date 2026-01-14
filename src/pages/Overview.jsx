@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { memberService } from '../services/memberService'
 import PageLayout from '../components/layout/PageLayout'
@@ -23,7 +23,7 @@ const Overview = () => {
       setLoading(true)
       const statsData = await memberService.fetchStats()
       setStats(statsData)
-    } catch (err) {
+    } catch {
       // Suppress errors for overview
     } finally {
       setLoading(false)

@@ -10,84 +10,103 @@ import './settings.css'
 const Settings = () => {
   const { user, updateUser } = useAuth()
 
-  const [churchInfo, setChurchInfo] = useState({
-    churchName: '',
-    pastorName: '',
-    churchAddress: '',
-    churchPhone: '',
-    churchEmail: '',
-    churchWebsite: '',
+  const [churchInfo, setChurchInfo] = useState(() => {
+    const saved = localStorage.getItem('churchInfo')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        return {
+          churchName: '',
+          pastorName: '',
+          churchAddress: '',
+          churchPhone: '',
+          churchEmail: '',
+          churchWebsite: '',
+        }
+      }
+    }
+    return {
+      churchName: '',
+      pastorName: '',
+      churchAddress: '',
+      churchPhone: '',
+      churchEmail: '',
+      churchWebsite: '',
+    }
   })
 
-  const [memberSettings, setMemberSettings] = useState({
-    ageThreshold: 18,
-    requirePhoneNumber: true,
-    requireGPSAddress: false,
+  const [memberSettings, setMemberSettings] = useState(() => {
+    const saved = localStorage.getItem('memberSettings')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        return {
+          ageThreshold: 18,
+          requirePhoneNumber: true,
+          requireGPSAddress: false,
+        }
+      }
+    }
+    return {
+      ageThreshold: 18,
+      requirePhoneNumber: true,
+      requireGPSAddress: false,
+    }
   })
 
-  const [userProfile, setUserProfile] = useState({
-    userName: '',
-    userRole: '',
-    userAffiliation: '',
-    avatar: '',
+  const [userProfile, setUserProfile] = useState(() => {
+    const saved = localStorage.getItem('userProfile')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        return { ...parsed, userName: '', userRole: '' }
+      } catch {
+        // Fallback
+      }
+    }
+    // Try to use user if available (note: this might be null on first render if context hasn't provided it)
+    return {
+      userName: '',
+      userRole: '',
+      userAffiliation: user?.affiliation || '',
+      avatar: user?.avatar || '',
+    }
   })
 
-  const [notifications, setNotifications] = useState({
-    newMemberAlerts: true,
-    memberUpdates: true,
-    weeklyReports: false,
-    emailNotifications: false,
-  })
-
+  // Only sync if user becomes available after mount AND there's no local profile
   useEffect(() => {
-    // Load saved settings
-    const savedChurchInfo = localStorage.getItem('churchInfo')
-    if (savedChurchInfo) {
-      try {
-        setChurchInfo(JSON.parse(savedChurchInfo))
-      } catch (error) {
-        console.error('Failed to load church info:', error)
-      }
+    if (!localStorage.getItem('userProfile') && user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUserProfile(prev => {
+        // Only update if actually different to avoid unnecessary renders
+        if (prev.avatar === (user.avatar || '') && prev.userAffiliation === (user.affiliation || '')) return prev;
+        return {
+          ...prev,
+          avatar: user.avatar || prev.avatar,
+          userAffiliation: user.affiliation || prev.userAffiliation
+        };
+      });
     }
+  }, [user])
 
-    const savedMemberSettings = localStorage.getItem('memberSettings')
-    if (savedMemberSettings) {
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('notificationSettings')
+    if (saved) {
       try {
-        setMemberSettings(JSON.parse(savedMemberSettings))
-      } catch (error) {
-        console.error('Failed to load member settings:', error)
+        return JSON.parse(saved)
+      } catch {
+        // Fallback
       }
     }
-
-    const savedProfile = localStorage.getItem('userProfile')
-    if (savedProfile) {
-      try {
-        const parsedProfile = JSON.parse(savedProfile)
-        // Ensure userName and userRole start empty to show placeholders
-        setUserProfile({ ...parsedProfile, userName: '', userRole: '' })
-      } catch (error) {
-        console.error('Failed to load profile:', error)
-      }
-    } else if (user) {
-      // Initialize from auth user if no local profile saved
-      setUserProfile(prev => ({
-        ...prev,
-        // userName: user.username || prev.userName, // Keep empty to show placeholder
-        // userRole: user.role || prev.userRole, // Keep empty to show placeholder
-        avatar: user.avatar || prev.avatar,
-        userAffiliation: user.affiliation || prev.userAffiliation
-      }))
+    return {
+      newMemberAlerts: true,
+      memberUpdates: true,
+      weeklyReports: false,
+      emailNotifications: false,
     }
-
-    const savedNotifications = localStorage.getItem('notificationSettings')
-    if (savedNotifications) {
-      try {
-        setNotifications(JSON.parse(savedNotifications))
-      } catch (error) {
-        console.error('Failed to load notifications:', error)
-      }
-    }
-  }, [])
+  })
 
   const handleChurchInfoChange = (event) => {
     const { name, value } = event.target

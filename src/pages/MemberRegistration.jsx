@@ -15,7 +15,7 @@ const MemberRegistration = () => {
   const handleSubmit = async (payload) => {
     try {
       setIsSaving(true)
-      const member = await memberService.createMember(payload)
+      const _member = await memberService.createMember(payload)
 
       // Dispatch custom event to notify other components (like Overview)
       window.dispatchEvent(new CustomEvent('memberUpdated'))

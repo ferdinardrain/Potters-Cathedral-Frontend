@@ -7,7 +7,7 @@ import TextInput from '../components/form/TextInput'
 import CustomSelect from '../components/form/CustomSelect'
 import MemberDetailsModal from '../components/members/MemberDetailsModal'
 import { useMembers } from '../hooks/useMembers'
-import { memberService, MARITAL_STATUS_FILTER_OPTIONS } from '../services/memberService'
+import { MARITAL_STATUS_FILTER_OPTIONS } from '../services/memberService'
 import { exportService } from '../services/exportService'
 import './membersList.css'
 
@@ -140,7 +140,7 @@ const MembersList = () => {
           confirmButtonColor: '#3b82f6',
           timer: 2000,
         })
-      } catch (error) {
+      } catch {
         await Swal.fire({
           icon: 'error',
           title: 'Error',

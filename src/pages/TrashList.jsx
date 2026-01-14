@@ -19,14 +19,14 @@ const TrashList = () => {
         error,
         filters,
         setFilters,
-        reload,
+        _reload,
         restoreMember,
         permanentlyDeleteMember
     } = useMembers()
     const [selectedMember, setSelectedMember] = useState(null)
 
     // Track previous pathname to detect navigation
-    const prevPathnameRef = useRef(location.pathname)
+    const _prevPathnameRef = useRef(location.pathname)
 
     // Handle initial filters for Trash
     useEffect(() => {
@@ -87,7 +87,7 @@ const TrashList = () => {
                     confirmButtonColor: '#3b82f6',
                     timer: 2000,
                 })
-            } catch (err) {
+            } catch {
                 await Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -119,7 +119,7 @@ const TrashList = () => {
                     confirmButtonColor: '#3b82f6',
                     timer: 2000,
                 })
-            } catch (err) {
+            } catch {
                 await Swal.fire({
                     icon: 'error',
                     title: 'Error',

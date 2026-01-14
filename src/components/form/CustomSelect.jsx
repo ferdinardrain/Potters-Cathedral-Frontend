@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import './customSelect.css'
 
@@ -19,6 +19,18 @@ const CustomSelect = ({
   const dropdownRef = useRef(null)
 
   const selectedOption = options.find((opt) => opt.value === value)
+
+  const handleSelect = useCallback((option) => {
+    const syntheticEvent = {
+      target: {
+        name,
+        value: option.value,
+      },
+    }
+    onChange(syntheticEvent)
+    setIsOpen(false)
+    setFocusedIndex(-1)
+  }, [name, onChange])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -80,19 +92,7 @@ const CustomSelect = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen, focusedIndex, options])
-
-  const handleSelect = (option) => {
-    const syntheticEvent = {
-      target: {
-        name,
-        value: option.value,
-      },
-    }
-    onChange(syntheticEvent)
-    setIsOpen(false)
-    setFocusedIndex(-1)
-  }
+  }, [isOpen, focusedIndex, options, handleSelect])
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen)

@@ -24,7 +24,7 @@ const defaultValues = {
   avatar: '',
 }
 
-const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel, isSaving }) => {
+const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel }) => {
   // Load registration settings from localStorage
   const settings = useMemo(() => {
     const saved = localStorage.getItem('memberSettings')
@@ -65,7 +65,7 @@ const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel, isSa
         setAltPhoneCountry(country.name)
       }
     }
-  }, [values.phoneNumber, values.altPhoneNumber, sortedCountries])
+  }, [values.phoneNumber, values.altPhoneNumber, sortedCountries, phoneCountry, altPhoneCountry])
 
   const handleNationalityChange = (country) => {
     setValues(prev => ({ ...prev, nationality: country.nationality }))
@@ -158,7 +158,7 @@ const MemberForm = ({ initialValues = defaultValues, onSubmit, submitLabel, isSa
     if (isMinor && values.maritalStatus) {
       setValues((prev) => ({ ...prev, maritalStatus: '' }))
     }
-  }, [isMinor])
+  }, [isMinor, values.maritalStatus])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -333,7 +333,6 @@ MemberForm.propTypes = {
   }),
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string.isRequired,
-  isSaving: PropTypes.bool,
 }
 
 export default MemberForm

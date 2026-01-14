@@ -1,27 +1,26 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { apiClient } from '../services/apiClient';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    // Check if user is already logged in on mount
-    useEffect(() => {
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        const storedAuth = localStorage.getItem('porters_auth');
+        return !!storedAuth;
+    });
+    const [user, setUser] = useState(() => {
         const storedAuth = localStorage.getItem('porters_auth');
         if (storedAuth) {
             try {
                 const authData = JSON.parse(storedAuth);
-                setIsAuthenticated(true);
-                setUser(authData.user);
-            } catch (error) {
-                localStorage.removeItem('porters_auth');
+                return authData.user;
+            } catch {
+                return null;
             }
         }
-        setLoading(false);
-    }, []);
+        return null;
+    });
+    const [loading] = useState(false);
 
     const login = async (username, password) => {
         try {
@@ -60,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
