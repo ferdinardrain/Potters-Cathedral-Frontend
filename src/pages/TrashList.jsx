@@ -34,6 +34,10 @@ const TrashList = () => {
     }, [setFilters])
 
     const rows = useMemo(() => {
+        // Don't show any members until we've loaded with the trash filter
+        if (loading || !filters.trash) {
+            return []
+        }
         return members.map((member) => ({
             id: member.id,
             fullName: member.fullName,
@@ -49,7 +53,7 @@ const TrashList = () => {
             joiningDate: member.joiningDate,
             deletedAt: member.deletedAt,
         }))
-    }, [members])
+    }, [members, loading, filters.trash])
 
     const handleFilterChange = (event) => {
         const { name, value } = event.target
