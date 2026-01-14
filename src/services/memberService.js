@@ -86,7 +86,17 @@ export const memberService = {
   },
 
   async permanentlyDeleteMember(memberId) {
-    await apiClient.delete(`/api/members/${memberId}/permanent`)
+    console.log('[Frontend] Calling permanent delete for ID:', memberId)
+    const url = `/api/members/${memberId}/permanent`
+    console.log('[Frontend] DELETE URL:', url)
+    try {
+      const result = await apiClient.delete(url)
+      console.log('[Frontend] Permanent delete successful:', result)
+      return result
+    } catch (error) {
+      console.error('[Frontend] Permanent delete failed:', error)
+      throw error
+    }
   },
 }
 
