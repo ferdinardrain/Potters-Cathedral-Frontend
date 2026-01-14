@@ -46,8 +46,7 @@ export const apiClient = {
         }
       })
       const response = await fetch(url, {
-        headers: getAuthHeaders(),
-        credentials: 'include'
+        headers: getAuthHeaders()
       })
       return handleResponse(response)
     } catch (error) {
@@ -60,7 +59,6 @@ export const apiClient = {
       const response = await fetch(`${API_BASE}${path}`, {
         method: 'POST',
         headers: getAuthHeaders(),
-        credentials: 'include',
         body: JSON.stringify(body),
       })
       return handleResponse(response)
@@ -74,7 +72,6 @@ export const apiClient = {
       const response = await fetch(`${API_BASE}${path}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
-        credentials: 'include',
         body: JSON.stringify(body),
       })
       return handleResponse(response)
@@ -87,8 +84,7 @@ export const apiClient = {
     try {
       const response = await fetch(`${API_BASE}${path}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include'
+        headers: getAuthHeaders()
       })
       return handleResponse(response)
     } catch (error) {

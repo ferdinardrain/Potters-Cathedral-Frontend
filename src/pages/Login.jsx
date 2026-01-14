@@ -18,10 +18,11 @@ const Login = () => {
         setError('');
         setIsLoading(true);
 
-        // Simulate network delay for better UX
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Trim inputs to handle mobile auto-correct spaces
+        const trimmedUsername = username.trim();
+        const trimmedPassword = password.trim();
 
-        const result = await login(username, password);
+        const result = await login(trimmedUsername, trimmedPassword);
 
         if (result.success) {
             await Swal.fire({
@@ -80,6 +81,9 @@ const Login = () => {
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
                                 autoFocus
+                                autoCapitalize="none"
+                                autoCorrect="off"
+                                autoComplete="username"
                             />
                         </div>
 
@@ -94,6 +98,7 @@ const Login = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
+                                    autoComplete="current-password"
                                 />
                                 <button
                                     type="button"
