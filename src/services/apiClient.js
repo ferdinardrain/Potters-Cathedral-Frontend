@@ -3,6 +3,28 @@ const FALLBACK_URL = import.meta.env.PROD
   : 'http://localhost:3000';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || FALLBACK_URL).trim().replace(/\/$/, '')
+const TIMEOUT_MS = 30000; // 30 seconds
+
+const fetchWithTimeout = async (url, options = {}) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out. The server might be waking up or your connection is slow. Please try again.');
+    }
+    throw error;
+  }
+};
+
 const handleResponse = async (response) => {
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
@@ -48,7 +70,7 @@ export const apiClient = {
       // Cache busting
       url.searchParams.append('_t', Date.now())
 
-      const response = await fetch(url, {
+      const response = await fetchWithTimeout(url, {
         headers: getAuthHeaders()
       })
       return handleResponse(response)
@@ -59,7 +81,7 @@ export const apiClient = {
 
   async post(path, body) {
     try {
-      const response = await fetch(`${API_BASE}${path}`, {
+      const response = await fetchWithTimeout(`${API_BASE}${path}`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(body),
@@ -72,7 +94,7 @@ export const apiClient = {
 
   async put(path, body) {
     try {
-      const response = await fetch(`${API_BASE}${path}`, {
+      const response = await fetchWithTimeout(`${API_BASE}${path}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify(body),
@@ -85,7 +107,7 @@ export const apiClient = {
 
   async delete(path) {
     try {
-      const response = await fetch(`${API_BASE}${path}`, {
+      const response = await fetchWithTimeout(`${API_BASE}${path}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       })

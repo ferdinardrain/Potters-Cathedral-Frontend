@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
+import { apiClient } from '../services/apiClient';
 import Swal from 'sweetalert2';
 import './login.css';
 
@@ -12,6 +13,14 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
+
+    // Warm up the backend as soon as the login page loads
+    // This wakes up Render's cold start while the user is typing
+    useEffect(() => {
+        apiClient.get('/').catch(() => {
+            // Ignore errors, we just want to trigger a wake-up request
+        });
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

@@ -9,28 +9,39 @@ const defaultFilters = {
   trash: false,
 }
 
-export const useMembers = () => {
+export const useMembers = (initialFilters = defaultFilters) => {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [filters, setFilters] = useState(defaultFilters)
+  const [filters, setFilters] = useState(initialFilters)
 
   const loadMembers = useCallback(async (customFilters = null) => {
+    let isCurrent = true
     try {
       setLoading(true)
       setError('')
       const filtersToUse = customFilters || filters
       const data = await memberService.fetchMembers(filtersToUse)
-      setMembers(data)
+      if (isCurrent) {
+        setMembers(data)
+      }
     } catch (err) {
-      setError(err.message || 'Failed to load members')
+      if (isCurrent) {
+        setError(err.message || 'Failed to load members')
+      }
     } finally {
-      setLoading(false)
+      if (isCurrent) {
+        setLoading(false)
+      }
     }
+    return () => { isCurrent = false }
   }, [filters])
 
   useEffect(() => {
-    loadMembers()
+    const cleanup = loadMembers()
+    return () => {
+      if (typeof cleanup === 'function') cleanup()
+    }
   }, [loadMembers])
 
   // Reload function that uses current filters

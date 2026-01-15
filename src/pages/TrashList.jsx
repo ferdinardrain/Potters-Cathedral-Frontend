@@ -19,19 +19,20 @@ const TrashList = () => {
         error,
         filters,
         setFilters,
-        _reload,
+        reload,
         restoreMember,
         permanentlyDeleteMember
-    } = useMembers()
+    } = useMembers({
+        search: '',
+        maritalStatus: '',
+        minAge: '',
+        maxAge: '',
+        trash: true
+    })
     const [selectedMember, setSelectedMember] = useState(null)
 
     // Track previous pathname to detect navigation
     const _prevPathnameRef = useRef(location.pathname)
-
-    // Handle initial filters for Trash
-    useEffect(() => {
-        setFilters(prev => ({ ...prev, trash: true }))
-    }, [setFilters])
 
     const rows = useMemo(() => {
         // Don't show any members until we've loaded with the trash filter
